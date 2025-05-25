@@ -1,0 +1,17 @@
+# Pythonキャッシュ
+__pycache__/
+*.py[cod]
+
+# PyInstallerビルド出力
+dist/
+build/
+
+# 実行ログ・一時ファイル
+*.log
+
+# 個人用設定・出力ファイル
+settings/
+output/
+
+# macOSの隠しファイル
+.DS_Store
