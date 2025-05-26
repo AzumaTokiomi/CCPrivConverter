@@ -13,5 +13,9 @@ build/
 settings/
 output/
 
+# リリース用のファイル
+release/CCPrivConverter.zip
+release/CCPrivConverter/ReadMe.txt
+
 # macOSの隠しファイル
 .DS_Store
