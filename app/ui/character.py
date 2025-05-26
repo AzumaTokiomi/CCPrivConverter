@@ -58,6 +58,9 @@ class CharacterTab:
         # frame_character：メインフレーム作成
         self.frame_character = ttk.Frame(self.canvas, padding=(10, 0))
 
+        #for i in range(2):  # ↑と↓ボタンの列
+        #    self.frame_character.grid_columnconfigure(i, weight=0, minsize=1)
+
         # キャンバス上に描画
         self.canvas.create_window(
             (0, 0),
@@ -98,12 +101,19 @@ class CharacterTab:
         """ build_header
             機能：ヘッダーの描画
         """
-        for col, character_config in enumerate(CHARACTER_CONFIG):
+        col_num = 0
+
+        # 列移動ラベル（列0〜1をまたぐ）
+        ttk.Label(self.frame_character, text=TEXTS[TextKey.SWAP_ROW_LABEL], padding=4, anchor="center").grid(row=0, column=col_num, columnspan=2, sticky="we")
+        col_num += 2
+
+        for character_config in CHARACTER_CONFIG:
             # フレームにラベル追加
-            ttk.Label(self.frame_character, text=TEXTS[character_config.label], padding=4).grid(row=0, column=col, sticky="")
+            ttk.Label(self.frame_character, text=TEXTS[character_config.label], padding=4).grid(row=0, column=col_num, sticky="")
+            col_num += 1
 
         # 削除ラベルの追加
-        ttk.Label(self.frame_character, text=TEXTS[TextKey.DELETE_ROW_LABEL]).grid(row=0, column=len(CHARACTER_CONFIG), sticky="")
+        ttk.Label(self.frame_character, text=TEXTS[TextKey.DELETE_ROW_LABEL]).grid(row=0, column=col_num, sticky="")
 
 
     def add_row(self, initial_values: Optional[Dict[str, Any]] = None, is_default: bool = False):
@@ -118,9 +128,27 @@ class CharacterTab:
         row = len(self._character_config) + 1
         row_vars = {}
         widgets = []
+        index = len(self._character_config)
+        col_num = 0
+
+        # 行移動ボタンの追加
+        if not is_default:
+            # ↑ボタン
+            up_btn = ttk.Button(self.frame_character, text="↑", width=2, command=lambda idx=index: self.move_row_up(idx))
+            up_btn.grid(row=row, column=col_num, padx=1)
+            col_num += 1
+
+            # ↓ボタン
+            down_btn = ttk.Button(self.frame_character, text="↓", width=2, command=lambda idx=index: self.move_row_down(idx))
+            down_btn.grid(row=row, column=col_num, padx=1)
+            col_num += 1
+
+            widgets.extend([up_btn, down_btn])
+        else:
+            col_num += 2    # デフォルト行の場合は場所を空ける
 
         # 列にウィジェットを追加
-        for col, setting in enumerate(CHARACTER_CONFIG):
+        for setting in CHARACTER_CONFIG:
             if initial_values is not None:
                 # initial_valuesがあれば、そのキーから値を取得（なければデフォルト）
                 value = initial_values.get(setting.key, setting.default)
@@ -133,11 +161,11 @@ class CharacterTab:
                 var = tk.StringVar(value=value)
                 if setting.key == ConfigKey.COLOR_CODE:
                     # カラーコードのみカラーピッカーを含めたウィジェットを追加する
-                    create_color_selector(self.frame_character, row, col, var)
-                    widgets.append(self.frame_character.grid_slaves(row=row, column=col)[0])
+                    create_color_selector(self.frame_character, row, col_num, var)
+                    widgets.append(self.frame_character.grid_slaves(row=row, column=col_num)[0])
                 else:
                     entry = ttk.Entry(self.frame_character, textvariable=var, width=12, takefocus=False)
-                    entry.grid(row=row, column=col, padx=2, pady=2, sticky="nsew")
+                    entry.grid(row=row, column=col_num, padx=2, pady=2, sticky="nsew")
 
                     # Default行の場合入力を受け付けない
                     if is_default and setting.key == ConfigKey.CHARACTER:
@@ -157,16 +185,21 @@ class CharacterTab:
                     var.set(True)
                     check.configure(state="disabled")
 
-                check.grid(row=row, column=col, sticky="", padx=2)
+                check.grid(row=row, column=col_num, sticky="", padx=2)
                 widgets.append(check)
             else:
                 continue
 
-            # 設定が変更されたら設定ファイルに保存する
             def change_character_config_var(*_):
+                """ change_character_config_var
+                    機能：設定が変更されたら設定ファイルに保存する
+                """
                 save_character_config(self.get_character_config_from_vars())
+
             var.trace_add("write", change_character_config_var)
             row_vars[setting.key] = var
+
+            col_num += 1    # 列番号の加算
 
         # デフォルト行以外は削除ボタンを追加する
         if not is_default:
@@ -177,8 +210,9 @@ class CharacterTab:
                 width=3,
                 command=lambda idx=index: self.click_remove_row(idx)
             )
-            delete_btn.grid(row=row, column=len(CHARACTER_CONFIG), padx=4)
+            delete_btn.grid(row=row, column=col_num, padx=4)
             widgets.append(delete_btn)
+            col_num += 1
 
         self._character_config.append({"values": row_vars, "widgets": widgets})
 
@@ -234,6 +268,9 @@ class CharacterTab:
         # 行追加ボタンを追加
         self.update_add_row_button()
 
+        # 並び順を含めて保存する
+        save_character_config(self.get_character_config_from_vars())
+
 
     def update_add_row_button(self):
         """ update_add_row_button
@@ -244,9 +281,9 @@ class CharacterTab:
             self.add_btn.destroy()
 
         self.add_btn = ttk.Button(self.frame_character, text=TEXTS[TextKey.ADD_ROW_LABEL], command=self.add_row)
-        # ヘッダーが row=0、各行が row=1～N にあるので +1
+        # ヘッダーが row=0のため
         row = len(self._character_config) + 1
-        self.add_btn.grid(row=row, column=0, padx=4, pady=10, sticky="w")
+        self.add_btn.grid(row=row, column=0, columnspan=3, padx=4, pady=10, ipadx=4, ipady=10, sticky="w")
 
 
     def clear_all(self):
@@ -279,3 +316,32 @@ class CharacterTab:
 
         return result
 
+
+    def move_row_up(self, index: int):
+        """ move_row_up
+            機能：行を上に移動する
+
+        Args:
+            index (int): 移動対象の行番号
+        """
+        # 最上段以外の時
+        if index > 0:
+            # スワップ
+            self._character_config[index], self._character_config[index - 1] = \
+                self._character_config[index - 1], self._character_config[index]
+            self.rebuild_all_rows()
+
+
+    def move_row_down(self, index: int):
+        """ move_row_up
+            機能：行を下に移動する
+
+        Args:
+            index (int): 移動対象の行番号
+        """
+        # 最下段以外の時
+        if index < len(self._character_config) - 1:
+            # スワップ
+            self._character_config[index], self._character_config[index + 1] = \
+                self._character_config[index + 1], self._character_config[index]
+            self.rebuild_all_rows()

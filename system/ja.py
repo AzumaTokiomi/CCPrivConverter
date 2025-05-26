@@ -47,6 +47,7 @@ TEXTS = {
     TextKey.VALID_SETTING_LABEL:    "着色有効",
     TextKey.DELETE_ROW_LABEL:       "行削除",
     TextKey.ADD_ROW_LABEL:          "行追加",
+    TextKey.SWAP_ROW_LABEL:         "並び替え",
 
     # プレビュー
     TextKey.BACKGROUND_COLOR_LABEL: "背景色",

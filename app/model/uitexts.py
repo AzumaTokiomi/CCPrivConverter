@@ -45,6 +45,7 @@ class TextKey:
     VALID_SETTING_LABEL     = "valid_setting_label"
     DELETE_ROW_LABEL        = "delete_row_label"
     ADD_ROW_LABEL           = "add_row_label"
+    SWAP_ROW_LABEL          = "swap_row_label"
 
     # プレビュー
     BACKGROUND_COLOR_LABEL  = "background_color_label"
