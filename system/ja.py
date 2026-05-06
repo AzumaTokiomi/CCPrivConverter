@@ -37,6 +37,7 @@ TEXTS = {
     TextKey.CONVERT_ASTERISK_LABEL:         "【*】を【＊】に変換する",
     TextKey.CONVERT_WAVE_LABEL:             "【~】を【～】に変換する",
     TextKey.CONVERT_WEB_LOG_LABEL:          "web向けのログ変換をする",
+    TextKey.CONVERT_BLANK_LINE_LABEL:       "空白行毎にspanタグを挿入する",
 
     # キャラ設定
     TextKey.CHARACTER_LABEL:        "キャラクター",

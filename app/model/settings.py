@@ -33,6 +33,7 @@ class ConfigKey:
     CONVERT_WAVE                = "convert_wave"
 
     CONVERT_WEB_LOG             = "convert_web_log"
+    CONVERT_BLANK_LINE          = "convert_blank_line"
 
     PREVIEW_BG_COLOR            = "preview_bg_color"
 
@@ -78,6 +79,7 @@ PRIVATTERPLUS_CONFIG = [
 # 開発者向け設定
 DEVELOPER_CONFIG = [
     ConvertConfig(ConfigKey.CONVERT_WEB_LOG,  "convert_web_log_label", "bool", False, "developer"),
+    ConvertConfig(ConfigKey.CONVERT_BLANK_LINE,  "convert_blank_line_label", "bool", False, "developer"),
 ]
 
 # プレビュー設定

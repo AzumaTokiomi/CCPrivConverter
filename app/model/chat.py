@@ -10,6 +10,7 @@ class ConvertFlags:
     delete_name: bool               # 名前削除
     compact: bool                   # コンパクト化するか
     class_name: str                 # クラス名
+    blank_line_span: bool           # 空白行毎にspanタグを挿入するか
 
 
 

@@ -184,13 +184,17 @@ def convert_log_to_chat_list(html_content: str, convert_config: dict, character_
             # 名前削除の有効無効
             delete_name = delete_name,
             # 前回の発言と色が変わってないかつ、コンパクトモード時はフラグを立てる
+            # 空白行毎にspanタグを挿入する設定が有効の場合はフラグを立てない（前回の発言と色が同じでもspanタグを挿入するため）
             compact = (
                 color_code == old_color_code
                 and convert_config.get(ConfigKey.COMPACT_MODE)
                 and old_color_code is not None
+                and not convert_config.get(ConfigKey.CONVERT_BLANK_LINE)
             ),
             # クラス名の設定
-            class_name = class_name
+            class_name = class_name,
+            # 空白行毎にspanタグを挿入する設定の有効無効
+            blank_line_span = convert_config.get(ConfigKey.CONVERT_BLANK_LINE)
         )
 
         # 発言リストに追加
@@ -326,6 +330,10 @@ def build_line(chat: Chat, text: str, mode: ConvertLogType) -> str:
     # コンパクト無効
     else:
         if mode == ConvertLogType.PRIVATTER:
+            # 空白行毎にspanタグを挿入する設定有効
+            if flag.blank_line_span:
+                text = re.sub(r'\n\s*\n', TEXT_NEWLINE + TEXT_NEWLINE + f'{HTML_SPAN_CLOSE}{HTML_SPAN_FOR_PRIVATTER}{chat.color_code}{HTML_SPAN_FOR_PRIVATTER_CLOSE}', text)
+
             line = f'{HTML_SPAN_CLOSE}{HTML_SPAN_FOR_PRIVATTER}{chat.color_code}{HTML_SPAN_FOR_PRIVATTER_CLOSE}{text}'
         elif mode == ConvertLogType.WEB:
             line = f'{HTML_SPAN_CLOSE}{HTML_SPAN_FOR_WEB}{flag.class_name}{HTML_SPAN_FOR_WEB_CLOSE}{text}'

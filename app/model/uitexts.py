@@ -35,6 +35,7 @@ class TextKey:
     CONVERT_ASTERISK_LABEL          = "convert_asterisk_label"
     CONVERT_WAVE_LABEL              = "convert_wave_label"
     CONVERT_WEB_LOG_LABEL           = "convert_web_log_label"
+    CONVERT_BLANK_LINE_LABEL        = "convert_blank_line_label"
 
     # キャラ設定
     CHARACTER_LABEL         = "character_label"
